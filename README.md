@@ -34,7 +34,7 @@
 
 ## 🚀 Live Demo
 
-**Try Buuchi now:** [https://yourusername.github.io/buuchi-ai-chat/](https://yourusername.github.io/buuchi-ai-chat/)
+**Try Buuchi now:** [https://yourusername.github.io/buuchi-ai-chat/](https://kodurmanas.github.io/BUUCHI-ai-chat/)
 
 *You'll need a free Google Gemini API key to wake Buuchi from his slumber.*
 
@@ -64,7 +64,7 @@
 ## 🎯 Use Cases
 
 ### **Education & Learning**
-- Get complex topics explained with Buuchi's dark humor
+- Get complex topics explained with Buuchi's dark humour
 - Science, math, programming, philosophy - all covered
 - Keyword highlighting helps identify important concepts
 
@@ -128,5 +128,6 @@ Created by a developer who believes AI should have personality! This project sta
 ---
 
 **Ready to face the shadows? Summon Buuchi and ask him anything... if you dare.** 👹
+
 
 *Made with 🖤 and a lot of spooky creativity*
