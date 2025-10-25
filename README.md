@@ -6,6 +6,13 @@
 
 **Buuchi** is a unique AI chat interface powered by Google's Gemini AI, but with a dark twist! Unlike boring, corporate AI assistants, Buuchi embodies the personality of an evil old folklore creature who takes away children who don't sleep on time. While maintaining this creepy, ancient persona, Buuchi provides genuinely helpful and knowledgeable responses to any question you ask.
 
+## 🚀 Live Demo
+
+**Try Buuchi now:** [https://yourusername.github.io/buuchi-ai-chat/](https://kodurmanas.github.io/BUUCHI-ai-chat/)
+
+*You'll need a free Google Gemini API key to wake Buuchi from his slumber.*
+
+
 ## ✨ Features
 
 ### 🎭 **Evil Folklore Personality**
@@ -31,12 +38,7 @@
 - **Smart formatting** - automatically formats responses with proper spacing
 - **Error handling** - graceful handling of network issues
 - **Token optimization** - efficient conversation management
-
-## 🚀 Live Demo
-
-**Try Buuchi now:** [https://yourusername.github.io/buuchi-ai-chat/](https://kodurmanas.github.io/BUUCHI-ai-chat/)
-
-*You'll need a free Google Gemini API key to wake Buuchi from his slumber.*
+  
 
 ## 🔑 Getting Your API Key
 
@@ -131,3 +133,4 @@ Created by a developer who believes AI should have personality! This project sta
 
 
 *Made with 🖤 and a lot of spooky creativity*
+
