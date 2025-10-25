@@ -8,7 +8,7 @@
 
 ## 🚀 Live Demo
 
-**Try Buuchi now:** [https://yourusername.github.io/buuchi-ai-chat/](https://kodurmanas.github.io/BUUCHI-ai-chat/)
+**Try Buuchi now:** [https://kodurmanas.github.io/BUUCHI-ai-chat/]
 
 *You'll need a free Google Gemini API key to wake Buuchi from his slumber.*
 
@@ -124,5 +124,6 @@ Created by a developer who believes AI should have personality! This project sta
 
 
 *Made with 🖤 and a lot of spooky creativity*
+
 
 
