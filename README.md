@@ -80,19 +80,10 @@
 - Client-side API integration patterns
 - Responsive design techniques
 
-## 🛠️ Local Development
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/buuchi-ai-chat.git
-
-# Open in your browser
-# No build process needed - it's pure HTML/CSS/JS!
-```
 
 ## 📱 Screenshots
 
-*Coming soon - add screenshots of Buuchi in action!*
+*Coming soon*
 
 ## 🤝 Contributing
 
@@ -133,4 +124,5 @@ Created by a developer who believes AI should have personality! This project sta
 
 
 *Made with 🖤 and a lot of spooky creativity*
+
 
