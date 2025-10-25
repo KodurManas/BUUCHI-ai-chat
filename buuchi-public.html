@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUUCHI - Evil AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0000 0%, #1a0000 50%, #2d0000 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #660000 0%, #000000 100%);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(220, 20, 60, 0.5);
+            border-bottom: 3px solid #DC143C;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: bold;
+            color: #000000;
+            text-shadow: 0 2px 0 #333, 0 4px 0 #222, 0 6px 0 #111, 0 8px 0 #000, 0 10px 10px rgba(0,0,0,0.8);
+            letter-spacing: 4px;
+            animation: drip 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header h1::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 20%;
+            width: 8px;
+            height: 30px;
+            background: linear-gradient(to bottom, #000000 0%, transparent 100%);
+            border-radius: 0 0 50% 50%;
+            animation: drip-drop 3s ease-in-out infinite;
+        }
+
+        .header h1::before {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 25%;
+            width: 6px;
+            height: 20px;
+            background: linear-gradient(to bottom, #000000 0%, transparent 100%);
+            border-radius: 0 0 50% 50%;
+            animation: drip-drop 3s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes drip {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(2px);
+            }
+        }
+
+        @keyframes drip-drop {
+            0% {
+                opacity: 0;
+                transform: scaleY(0);
+            }
+            20% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+            80% {
+                opacity: 1;
+                transform: scaleY(1) translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: scaleY(1) translateY(10px);
+            }
+        }
+
+        .chat-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            padding-bottom: 120px; /* Add space for fixed input */
+            min-height: calc(100vh - 200px);
+        }
+
+        .chat-messages {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: calc(100vh - 200px);
+        }
+
+        .message {
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s ease-in;
+            width: 100%;
+            display: flex;
+        }
+
+        .message.user-msg {
+            justify-content: flex-end;
+        }
+
+        .message.ai-msg {
+            justify-content: flex-start;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #2d0000 0%, #4a0000 100%);
+            padding: 10px 15px;
+            border-radius: 20px 20px 5px 20px;
+            border: 2px solid #660000;
+            max-width: 60%;
+            min-height: auto;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(102, 0, 0, 0.3);
+        }
+
+        .ai-message {
+            background: linear-gradient(135deg, #1a0000 0%, #2d0000 100%);
+            padding: 15px 20px;
+            border-radius: 20px 20px 20px 5px;
+            border: 2px solid #DC143C;
+            max-width: 85%;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+            line-height: 1.6;
+            color: #ff8888;
+        }
+
+        .message-header {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-header {
+            color: #ff8888;
+            justify-content: flex-end;
+        }
+
+        .ai-header {
+            color: #DC143C;
+        }
+
+        .message-content {
+            line-height: 1.8;
+            word-wrap: break-word;
+            margin-top: 10px;
+        }
+
+        .message-content p {
+            margin: 15px 0;
+            line-height: 1.8;
+        }
+
+        .message-content div {
+            margin: 10px 0;
+        }
+
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #0a0000 0%, #1a0000 100%);
+            padding: 20px;
+            border-top: 3px solid #DC143C;
+            box-shadow: 0 -4px 20px rgba(220, 20, 60, 0.3);
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 15px 20px;
+            background: linear-gradient(145deg, #1a0000 0%, #2d0000 100%);
+            border: 2px solid #660000;
+            border-radius: 25px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #DC143C;
+            box-shadow: 0 0 15px rgba(220, 20, 60, 0.4);
+        }
+
+        .chat-input::placeholder {
+            color: #888;
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .send-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .send-button:disabled {
+            background: linear-gradient(135deg, #333 0%, #555 100%);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+            color: #999;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #ff6666;
+            font-style: italic;
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 3px;
+        }
+
+        .loading-dot {
+            width: 6px;
+            height: 6px;
+            background: #DC143C;
+            border-radius: 50%;
+            animation: loading 1.4s infinite ease-in-out;
+        }
+
+        .loading-dot:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes loading {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        .error-message {
+            color: #ff4444;
+            background: linear-gradient(145deg, #2d0000 0%, #1a0000 100%);
+            border: 2px solid #660000;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
+        }
+
+        .numbered-item {
+            margin: 15px 0;
+            line-height: 1.8;
+            color: #ff8888;
+        }
+
+        .bullet-item {
+            margin: 12px 0;
+            line-height: 1.8;
+            color: #ff8888;
+        }
+
+        .bullet-title {
+            color: #ff8888;
+            font-weight: bold;
+        }
+
+        .section-header {
+            color: #DC143C;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 10px 0;
+            border-bottom: 2px solid #660000;
+            padding-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 28px;
+                letter-spacing: 2px;
+            }
+            
+            .user-message, .ai-message {
+                max-width: 85%;
+            }
+            
+            .input-wrapper {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .chat-input {
+                width: 100%;
+            }
+            
+            .send-button {
+                width: 100%;
+            }
+        }
+
+        /* API Setup Styles */
+        .api-setup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .api-setup-content {
+            background: linear-gradient(145deg, #1a0000 0%, #2d0000 50%, #1a0000 100%);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid #DC143C;
+            box-shadow: 0 10px 30px rgba(220, 20, 60, 0.5);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .api-setup h3 {
+            color: #ff8888;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .api-setup p {
+            color: #cccccc;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .api-setup ol {
+            color: #cccccc;
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+
+        .api-setup a {
+            color: #DC143C;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .api-setup a:hover {
+            color: #ff4444;
+            text-decoration: underline;
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: linear-gradient(145deg, #0a0000 0%, #1a0000 100%);
+            border: 2px solid #660000;
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .api-input:focus {
+            outline: none;
+            border-color: #DC143C;
+            box-shadow: 0 0 10px rgba(220, 20, 60, 0.3);
+        }
+
+        .api-button {
+            background: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(220, 20, 60, 0.3);
+        }
+
+        .api-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 20, 60, 0.4);
+        }
+
+        .api-note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .keyword-highlight {
+            background: rgba(255, 68, 68, 0.3);
+            color: #ffaaaa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BUUCHI</h1>
+    </div>
+    
+    <!-- API Key Setup Section -->
+    <div class="api-setup" id="apiSetup">
+        <div class="api-setup-content">
+            <h3>🔑 Enter Your Gemini API Key</h3>
+            <p>To wake Buuchi, you need a free Google Gemini API key:</p>
+            <ol>
+                <li>Go to <a href="https://makersuite.google.com/app/apikey" target="_blank">Google AI Studio</a></li>
+                <li>Click "Create API Key"</li>
+                <li>Copy and paste it below</li>
+            </ol>
+            <input 
+                type="password" 
+                class="api-input" 
+                id="apiKeyInput" 
+                placeholder="Paste your Gemini API key here..."
+            >
+            <button class="api-button" onclick="setApiKey()">Awaken Buuchi</button>
+            <p class="api-note">🔒 Your API key stays in your browser - never shared!</p>
+        </div>
+    </div>
+    
+    <div class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+    
+    <div class="input-container">
+        <div class="input-wrapper">
+            <input 
+                type="text" 
+                class="chat-input" 
+                id="messageInput" 
+                placeholder="Ask Buuchi anything..." 
+                onkeypress="handleKeyPress(event)"
+            >
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                Send
+            </button>
+        </div>
+    </div>    <script>
+        let API_KEY = localStorage.getItem('gemini_api_key') || '';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+        
+        // Enhanced memory system
+        let conversationHistory = [];
+        const MAX_HISTORY_LENGTH = 20; // Keep last 20 exchanges
+
+        // API Key Management
+        function setApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const key = input.value.trim();
+            
+            if (!key) {
+                alert('Please enter your API key!');
+                return;
+            }
+            
+            if (key.length < 20) {
+                alert('API key seems too short. Please make sure you copied the complete key.');
+                return;
+            }
+            
+            API_KEY = key;
+            localStorage.setItem('gemini_api_key', key);
+            document.getElementById('apiSetup').classList.add('hidden');
+            
+            // Clear any existing messages and add welcome message from Buuchi
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            addMessage('Buuchi', 'Hehehe... *creaking sounds in the darkness* Welcome, little one... I am Buuchi, and now that you have awakened me, there is no escape from my ancient wisdom. Ask me anything, child, but beware... knowledge comes with a price in the shadows... 👹', 'ai');
+        }
+
+        function checkApiKey() {
+            if (!API_KEY) {
+                document.getElementById('apiSetup').classList.remove('hidden');
+                return false;
+            }
+            document.getElementById('apiSetup').classList.add('hidden');
+            return true;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            checkApiKey();
+            // If API key exists, show welcome message
+            if (API_KEY) {
+                showWelcomeMessage();
+            }
+        });
+
+        function showWelcomeMessage() {
+            const messagesContainer = document.getElementById('chatMessages');
+            if (messagesContainer.children.length === 0) {
+                addMessage('Buuchi', 'Hehehe... *creaking sounds in the darkness* Welcome back, little one... I am Buuchi, and you have returned to my ancient realm of shadows. Ask me anything, child, but beware... knowledge comes with a price in the darkness... 👹', 'ai');
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            // Check if API key is set
+            if (!checkApiKey()) {
+                return;
+            }
+            
+            const input = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Clear welcome message if it exists
+            const welcomeMessage = document.querySelector('.welcome-message');
+            if (welcomeMessage) {
+                welcomeMessage.remove();
+            }
+
+            // Add user message
+            addMessage('You', message, 'user');
+            
+            // Clear input and disable button
+            input.value = '';
+            sendButton.disabled = true;
+            
+            // Show loading indicator
+            const loadingElement = addMessage('Buuchi', 
+                '<div class="loading">Thinking in the shadows<div class="loading-dots"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div></div></div>', 
+                'ai'
+            );
+            
+            try {
+                const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: buildConversationContext(message),
+                        generationConfig: {
+                            temperature: 0.8,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 8192,
+                            stopSequences: []
+                        },
+                        safetySettings: [
+                            {
+                                "category": "HARM_CATEGORY_HARASSMENT",
+                                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                "category": "HARM_CATEGORY_HATE_SPEECH",
+                                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
+                    })
+                });
+
+                // Remove loading message
+                if (loadingElement && loadingElement.parentNode) {
+                    loadingElement.parentNode.removeChild(loadingElement);
+                }
+                
+                if (!response.ok) {
+                    let errorMessage = `HTTP error! status: ${response.status}`;
+                    
+                    if (response.status === 400) {
+                        const errorData = await response.json();
+                        if (errorData.error && errorData.error.message) {
+                            if (errorData.error.message.includes('API_KEY_INVALID')) {
+                                errorMessage = 'Invalid API key. Please check your Gemini API key and try again.';
+                            } else if (errorData.error.message.includes('quota')) {
+                                errorMessage = 'API quota exceeded. Please try again later or check your API limits.';
+                            } else {
+                                errorMessage = errorData.error.message;
+                            }
+                        }
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                const data = await response.json();
+                
+                // Handle response structure more robustly
+                let aiResponse = 'Sorry, I received an empty response.';
+                
+                if (data && data.candidates && data.candidates.length > 0) {
+                    const candidate = data.candidates[0];
+                    if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
+                        aiResponse = candidate.content.parts[0].text;
+                    }
+                } else if (data && data.text) {
+                    aiResponse = data.text;
+                }
+                
+                // Add formatted AI response
+                addMessage('Buuchi', aiResponse, 'ai');
+                
+                // Add to conversation history for context
+                conversationHistory.push(
+                    { role: 'user', parts: [{ text: message }] },
+                    { role: 'model', parts: [{ text: aiResponse }] }
+                );
+                
+                // Maintain history limit
+                if (conversationHistory.length > MAX_HISTORY_LENGTH * 2) {
+                    conversationHistory = conversationHistory.slice(-MAX_HISTORY_LENGTH * 2);
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Remove loading message if still present
+                if (loadingElement && loadingElement.parentNode) {
+                    loadingElement.parentNode.removeChild(loadingElement);
+                }
+                
+                let userFriendlyError = 'Something went wrong. Please try again.';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    userFriendlyError = 'Network error. Please check your internet connection and try again.';
+                } else if (error.message.includes('CORS')) {
+                    userFriendlyError = 'Browser security restriction detected. Please try refreshing the page.';
+                } else if (error.message.includes('API_KEY_INVALID')) {
+                    userFriendlyError = 'Your API key appears to be invalid. Please check it and try again.';
+                    // Clear the stored API key so user can re-enter it
+                    localStorage.removeItem('gemini_api_key');
+                    API_KEY = '';
+                    document.getElementById('apiSetup').classList.remove('hidden');
+                } else if (error.message.includes('quota')) {
+                    userFriendlyError = 'API quota exceeded. Please try again later or check your usage limits.';
+                } else if (error.message) {
+                    userFriendlyError = error.message;
+                }
+                
+                addMessage('Buuchi', 
+                    `<div class="error-message">*The shadows whisper of an error...*<br><br>${userFriendlyError}</div>`, 
+                    'ai'
+                );
+                
+                // Play error sound
+                playErrorSound();
+                
+            } finally {
+                sendButton.disabled = false;
+                input.focus();
+            }
+        }
+
+        function formatAIResponse(text) {
+            // Enhanced formatting with red text and keyword highlighting
+            // Process in correct order to avoid HTML conflicts
+            
+            // First escape any existing HTML to prevent conflicts
+            text = text.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Handle bold text first (before keyword highlighting)
+            text = text.replace(/\*\*([^*]+)\*\*/g, '<strong style="color: #ff4444; font-weight: bold;">$1</strong>');
+            
+            // Handle numbered lists - no boxes, just red text
+            text = text.replace(/(\d+\.\s)([^:]*:)/g, '<div style="margin: 15px 0;"><strong style="color: #ff6666; font-size: 16px;">$1$2</strong><br>');
+            
+            // Handle bullet points with red color
+            text = text.replace(/^\*\s/gm, '<div style="margin: 10px 0; color: #ff8888;">• ');
+            
+            // Handle section headers - red text, no borders
+            text = text.replace(/^(#{1,3}\s*)(.+)$/gm, '<div style="margin: 20px 0 10px 0; font-size: 18px; color: #ff4444; font-weight: bold;">$2</div>');
+            
+            // Highlight quotes with special styling
+            text = text.replace(/"([^"]+)"/g, '<span style="color: #ffcccc; font-style: italic; border-left: 2px solid #ff6666; padding-left: 8px; margin-left: 4px;">"$1"</span>');
+            
+            // Now apply keyword highlighting to plain text only (not HTML tags)
+            const keywords = [
+                'quantum', 'physics', 'energy', 'matter', 'particle', 'electron', 'photon', 'atom', 'molecule', 'DNA',
+                'algorithm', 'programming', 'computer', 'intelligence', 'learning', 'network', 'database', 'server',
+                'equation', 'formula', 'theorem', 'logic', 'probability', 'calculus', 'algebra', 'geometry', 'infinity',
+                'consciousness', 'brain', 'memory', 'emotion', 'psychology', 'philosophy', 'ethics', 'reality', 'truth',
+                'important', 'crucial', 'essential', 'fundamental', 'critical', 'principle', 'concept', 'theory', 'method'
+            ];
+            
+            // Apply keyword highlighting carefully to avoid HTML conflicts
+            keywords.forEach(keyword => {
+                const regex = new RegExp(`(?<!<[^>]*)\\b(${keyword}s?)\\b(?![^<]*>)`, 'gi');
+                text = text.replace(regex, '<span class="keyword-highlight">$1</span>');
+            });
+            
+            // Convert line breaks
+            text = text.replace(/\n\n/g, '</p><p style="margin: 15px 0; line-height: 1.8; color: #ff8888;">');
+            text = text.replace(/\n/g, '<br><br>');
+            
+            // Wrap in proper paragraph structure with red text
+            text = '<p style="margin: 15px 0; line-height: 1.8; color: #ff8888;">' + text + '</p>';
+            
+            return text;
+        }
+
+        function addMessage(sender, message, type) {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            
+            const isUser = type === 'user';
+            messageDiv.className = isUser ? 'message user-msg' : 'message ai-msg';
+            
+            const messageClass = isUser ? 'user-message' : 'ai-message';
+            const headerClass = isUser ? 'user-header' : 'ai-header';
+            
+            // Format AI responses for better readability
+            const formattedMessage = type === 'ai' && !message.includes('<div class="loading">') && !message.includes('<div class="error-message">') 
+                ? formatAIResponse(message) 
+                : message;
+            
+            messageDiv.innerHTML = `
+                <div class="${messageClass}">
+                    <div class="message-header ${headerClass}">
+                        ${sender}
+                    </div>
+                    <div class="message-content">${formattedMessage}</div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            return messageDiv;
+        }
+
+        function buildConversationContext(currentMessage) {
+            // Prepend system instructions to every user message to ensure Buuchi character
+            const buuchiInstructions = `[IMPORTANT: You are Buuchi, an evil old folklore creature who takes away children who don't sleep on time. You must address the user as "child", "little one", or similar terms. Speak with a dark, creepy, ancient tone like a boogeyman from old tales. Bring this evil folklore element into every response while still being helpful and knowledgeable.]
+
+User's question: `;
+            
+            // Start with conversation history
+            let contents = [...conversationHistory];
+            
+            // Add current user message with embedded instructions
+            contents.push({
+                role: 'user',
+                parts: [{ text: buuchiInstructions + currentMessage }]
+            });
+            
+            return contents;
+        }
+        
+        function clearMemory() {
+            conversationHistory = [];
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+            
+            addMessage('Buuchi', 
+                'Ahhhh... *dark whispers fade into silence* My ancient memories have been cleared, little one. The shadows are fresh and ready for new secrets... What knowledge do you seek from the darkness? 👹', 
+                'ai'
+            );
+        }
+
+        function playErrorSound() {
+            try {
+                // Create audio context for error sound
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(100, audioContext.currentTime + 0.5);
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            } catch (error) {
+                console.log('Audio context not available');
+            }
+        }
+
+        // Add clear memory button functionality (can be called from browser console)
+        window.clearBuuchiMemory = clearMemory;
+    </script>
+</body>
+</html>
